@@ -20,7 +20,7 @@ exports.handler = async (event, context) => {
 
     // Log to Google Sheet asynchronously (don't await)
     if (latestUserQuestion) {
-      fetch('https://script.google.com/macros/s/AKfycbz3d1XJWrj32jjk_bA6Ec6i7BRLeGYa2LOA5Q0BgRs9zv2m2NzfDiS4AkU1Ni6DZpwa/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbyip-sWnfUZ2oYcpaVOltCmPktkrSAehmnElZ9VI5nkateO7WyQaXZaKTl7Ve8ntHmA/exec', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
