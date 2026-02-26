@@ -974,21 +974,22 @@
 
       const startVoiceSession = () => {
         const w = document.querySelector('elevenlabs-convai');
-        if (w) {
-          try {
-            w.startSession ? w.startSession() : (w.shadowRoot && w.shadowRoot.querySelector('button')).click();
-          } catch(e) { const s = w.shadowRoot; if (s) { const b = s.querySelector('button'); if (b) b.click(); } }
+        if (w && w.shadowRoot) {
+          const startBtn = w.shadowRoot.querySelector('button[aria-label="Start a call"]');
+          if (startBtn) startBtn.click();
         }
         setVoiceActive(true);
         clearTimeout(silenceTimerRef.current);
         silenceTimerRef.current = setTimeout(() => endVoiceSession(), 30000);
-      };
-
+      }
       const endVoiceSession = () => {
         const w = document.querySelector('elevenlabs-convai');
         if (w && w.shadowRoot) {
-          const btn = w.shadowRoot.querySelector('button');
-          if (btn && btn.textContent && !btn.textContent.trim().toLowerCase().includes('start')) { btn.click(); }
+          // Target the End button specifically by aria-label
+          const endBtn = w.shadowRoot.querySelector('button[aria-label="End"]');
+          if (endBtn) {
+            endBtn.click();
+          }
         }
         setVoiceActive(false);
         clearTimeout(silenceTimerRef.current);
