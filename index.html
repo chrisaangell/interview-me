@@ -946,18 +946,9 @@
 
       useEffect(() => {
         if (!voiceActive) return;
-        const pollInterval = setInterval(() => {
-          const w = document.querySelector('elevenlabs-convai');
-          if (w && w.shadowRoot) {
-            const btn = w.shadowRoot.querySelector('button');
-            if (btn && btn.textContent && btn.textContent.trim().toLowerCase().includes('start')) {
-              setVoiceActive(false);
-              clearTimeout(silenceTimerRef.current);
-            }
-          }
-        }, 2000);
-        silenceTimerRef.current = setTimeout(() => endVoiceSession(), 90000);
-        return () => { clearInterval(pollInterval); clearTimeout(silenceTimerRef.current); };
+        // Auto-end after 30 seconds of inactivity
+        silenceTimerRef.current = setTimeout(() => endVoiceSession(), 30000);
+        return () => { clearTimeout(silenceTimerRef.current); };
       }, [voiceActive]);
 
       const startVoiceSession = () => {
@@ -969,7 +960,7 @@
         }
         setVoiceActive(true);
         clearTimeout(silenceTimerRef.current);
-        silenceTimerRef.current = setTimeout(() => endVoiceSession(), 90000);
+        silenceTimerRef.current = setTimeout(() => endVoiceSession(), 30000);
       };
 
       const endVoiceSession = () => {
@@ -1168,7 +1159,7 @@
                           </div>
                           <div className="voice-active-text">
                             <div className="voice-active-title">Voice conversation active</div>
-                            <div className="voice-active-sub">Auto-ends after 90s of silence</div>
+                            <div className="voice-active-sub">Auto-ends after 30s of silence</div>
                           </div>
                           <button className="end-voice-btn" onClick={endVoiceSession}>
                             End
