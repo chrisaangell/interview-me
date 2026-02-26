@@ -136,10 +136,11 @@
 
     .hero-right {
       background: #fafafa;
-      padding: 40px;
+      padding: 48px 40px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      overflow-y: auto;
     }
 
     /* Chat Interface */
@@ -468,45 +469,6 @@
     /* Loading */
     .loading {
       display: flex;
-
-              .talk-btn {
-                          padding: 12px 20px;
-                          background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
-                          color: white;
-                          border: 2px solid #2563eb;
-                          border-radius: 4px;
-                          font-size: 14px;
-                          font-weight: 600;
-                          cursor: pointer;
-                          transition: all 0.2s ease;
-                          font-family: inherit;
-                          display: flex;
-                          align-items: center;
-                          gap: 6px;
-                          white-space: nowrap;
-                          letter-spacing: 0.01em;
-              }
-
-              .talk-btn:hover {
-                          background: #2563eb;
-                          border-color: #2563eb;
-                          transform: translateY(-1px);
-              }
-
-              .talk-btn.active {
-                          background: #dc2626;
-                          border-color: #dc2626;
-                          animation: pulse-mic 1.5s ease-in-out infinite;
-              }
-
-              @keyframes pulse-mic {
-                          0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
-                          50% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
-              }
-
-              elevenlabs-convai {
-                          display: none;
-              }
       gap: 4px;
       padding: 8px 0;
     }
@@ -525,6 +487,101 @@
     @keyframes bounce {
       0%, 80%, 100% { transform: scale(0); }
       40% { transform: scale(1); }
+    }
+
+    /* Talk Button */
+    .talk-btn {
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
+      color: white;
+      border: 2px solid #2563eb;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+    }
+
+    .talk-btn:hover {
+      background: #2563eb;
+      border-color: #2563eb;
+      transform: translateY(-1px);
+    }
+
+    .talk-btn.active {
+      background: #dc2626;
+      border-color: #dc2626;
+      animation: pulse-mic 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-mic {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+    }
+
+    elevenlabs-convai {
+      display: none;
+    }
+
+    /* Voice CTA Banner */
+    .voice-cta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: none;
+      width: 100%;
+      color: white;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    .voice-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+    }
+
+    .voice-cta.listening {
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      animation: pulse-mic 1.5s ease-in-out infinite;
+    }
+
+    .voice-cta-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .voice-cta-text {
+      flex: 1;
+    }
+
+    .voice-cta-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    .voice-cta-sub {
+      font-size: 12px;
+      opacity: 0.8;
+      font-weight: 400;
     }
 
     /* Tech Stack Section */
@@ -977,9 +1034,23 @@
 
                   {showTopics && (
                     <>
+                      <button
+                        className="voice-cta"
+                        id="voice-cta-btn"
+                        onClick={() => { const w = document.querySelector('elevenlabs-convai'); if (w) { try { w.startSession ? w.startSession() : (w.shadowRoot && w.shadowRoot.querySelector('button')).click(); } catch(e) { const s = w.shadowRoot; if(s){ const b = s.querySelector('button'); if(b) b.click(); } } } }}
+                      >
+                        <div className="voice-cta-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        </div>
+                        <div className="voice-cta-text">
+                          <div className="voice-cta-title">Hear my actual voice — click to talk</div>
+                          <div className="voice-cta-sub">Powered by ElevenLabs AI · Speak or listen</div>
+                        </div>
+                        <span style={{fontSize: '20px', opacity: 0.7}}>&#x203A;</span>
+                      </button>
                       {messages.length === 0 && (
                         <p className="topics-intro">
-                          Type a question — or hit Talk to hear my voice.
+                          Or choose a topic below to type your question.
                         </p>
                       )}
                       <div className="topics-grid">
