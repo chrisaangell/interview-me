@@ -410,7 +410,7 @@
       border: 1px solid #dbeafe;
     }
 
-    /* Input */
+    /* Input & Voice */
     .input-container {
       display: flex;
       gap: 10px;
@@ -468,6 +468,45 @@
     /* Loading */
     .loading {
       display: flex;
+
+              .talk-btn {
+                          padding: 12px 20px;
+                          background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
+                          color: white;
+                          border: 2px solid #2563eb;
+                          border-radius: 4px;
+                          font-size: 14px;
+                          font-weight: 600;
+                          cursor: pointer;
+                          transition: all 0.2s ease;
+                          font-family: inherit;
+                          display: flex;
+                          align-items: center;
+                          gap: 6px;
+                          white-space: nowrap;
+                          letter-spacing: 0.01em;
+              }
+
+              .talk-btn:hover {
+                          background: #2563eb;
+                          border-color: #2563eb;
+                          transform: translateY(-1px);
+              }
+
+              .talk-btn.active {
+                          background: #dc2626;
+                          border-color: #dc2626;
+                          animation: pulse-mic 1.5s ease-in-out infinite;
+              }
+
+              @keyframes pulse-mic {
+                          0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+                          50% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+              }
+
+              elevenlabs-convai {
+                          display: none;
+              }
       gap: 4px;
       padding: 8px 0;
     }
@@ -914,12 +953,12 @@
             <div className="hero-right" ref={chatRef}>
               <div className="chat-wrapper">
                 <div className="chat-header">
-                  <div className="chat-label">Interactive AI</div>
-                  <h2 className="chat-title">Ask Me Anything</h2>
+                  <div className="chat-label">Type or Talk</div>
+                  <h2 className="chat-title">Interview Me</h2>
                 </div>
 
                 <p className="disclaimer">
-                  Yes, this is an AI trained on my experience. It's shockingly accurate but occasionally makes things up. Welcome to 2026.
+                  Type your question below, or hit <strong>Talk</strong> to ask with your voice — powered by my cloned voice and AI.
                 </p>
 
                 <div className="chat-container">
@@ -940,7 +979,7 @@
                     <>
                       {messages.length === 0 && (
                         <p className="topics-intro">
-                          Select a topic or type your own question below.
+                          Type a question — or hit Talk to hear my voice.
                         </p>
                       )}
                       <div className="topics-grid">
@@ -1005,13 +1044,17 @@
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
-                        placeholder="Type your question..."
+                        placeholder="Interview Me..."
                         disabled={loading}
                       />
                     </div>
                     <button className="send-btn" onClick={() => handleSubmit()} disabled={loading || !input.trim()}>
                       Send
                     </button>
+                                  <button className="talk-btn" id="voice-talk-btn" onClick={() => { const w = document.querySelector('elevenlabs-convai'); if (w) { try { w.startSession ? w.startSession() : (w.shadowRoot && w.shadowRoot.querySelector('button[class*="call"], button[aria-label*="call"], button[aria-label*="Call"]') || w.shadowRoot && w.shadowRoot.querySelector('button')).click(); } catch(e) { const s = w.shadowRoot; if(s){ const b = s.querySelector('button'); if(b) b.click(); } } } }} title="Start a voice conversation">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                                                    Talk
+                                  </button>
                   </div>
                 </div>
               </div>
