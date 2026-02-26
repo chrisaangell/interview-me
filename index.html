@@ -54,6 +54,27 @@
       opacity: 0.15;
       transform: rotate(-12deg);
     }
+    .hero-portrait {
+      position: absolute;
+      right: -20px;
+      bottom: 0;
+      width: 65%;
+      max-width: 380px;
+      opacity: 0.18;
+      pointer-events: none;
+      user-select: none;
+      mask-image: linear-gradient(to top, transparent 0%, rgba(0,0,0,0.5) 25%, black 55%);
+      -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0,0,0,0.5) 25%, black 55%);
+    }
+
+    .voice-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.4);
+      flex-shrink: 0;
+    }
 
     .hero-label {
       font-size: 12px;
@@ -1108,7 +1129,8 @@
               </div>
             </div>
 
-            <div className="hero-right" ref={chatRef}>
+              <img src="chris-angell-portrait.png" className="hero-portrait" alt="" aria-hidden="true" />
+        <div className="hero-right" ref={chatRef}>
               <div className="chat-wrapper">
                 <div className="chat-header">
                   <div className="chat-label">Type or Talk</div>
