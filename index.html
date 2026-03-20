@@ -547,7 +547,13 @@
     }
 
     elevenlabs-convai {
-      display: none;
+      position: fixed;
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+      z-index: -1;
     }
 
     /* Voice CTA Banner */
@@ -966,10 +972,38 @@
 
 
       const startVoiceSession = () => {
+        // Unlock AudioContext within this user gesture — required for iOS/Safari
+        try {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) {
+            const ctx = new AudioCtx();
+            ctx.resume();
+          }
+        } catch(e) {}
+
+        // Click the ElevenLabs widget's real Start button
         const w = document.querySelector('elevenlabs-convai');
-        if (w && w.shadowRoot) {
-          const startBtn = w.shadowRoot.querySelector('button[aria-label="Start a call"]');
-          if (startBtn) startBtn.click();
+        if (w) {
+          // Make widget briefly renderable so its shadow DOM button exists
+          w.style.setProperty('display', 'block', 'important');
+          w.style.setProperty('position', 'fixed', 'important');
+          w.style.setProperty('top', '-9999px', 'important');
+          w.style.setProperty('left', '-9999px', 'important');
+          w.style.setProperty('width', '1px', 'important');
+          w.style.setProperty('height', '1px', 'important');
+          w.style.setProperty('opacity', '0', 'important');
+          w.style.setProperty('pointer-events', 'none', 'important');
+
+          const tryClick = (attempts) => {
+            if (attempts <= 0) return;
+            const sr = w.shadowRoot;
+            if (sr) {
+              const startBtn = sr.querySelector('button[aria-label="Start a call"]');
+              if (startBtn) { startBtn.click(); return; }
+            }
+            setTimeout(() => tryClick(attempts - 1), 100);
+          };
+          tryClick(10);
         }
         setVoiceActive(true);
       }
@@ -1032,7 +1066,7 @@
         },
         {
           id: 'recommendations',
-          icon: '★★★★☆',
+          icon: 'âââââ',
           title: 'Unsolicited Recommendations',
           desc: 'What others say',
           questions: [
@@ -1128,14 +1162,14 @@
                 </div>
 
                 <p className="disclaimer">
-                  Type your question below, or hit <strong>Talk</strong> to ask with your voice — powered by my cloned voice and AI.
+                  Type your question below, or hit <strong>Talk</strong> to ask with your voice â powered by my cloned voice and AI.
                 </p>
 
                 <div className="chat-container">
                   {messages.length > 0 && (
                     <div className="chat-actions">
                       <button className="reset-button" onClick={() => { setMessages([]); setShowTopics(true); }}>
-                        <span>←</span> New Conversation
+                        <span>â</span> New Conversation
                       </button>
                       {!showTopics && (
                         <button className="show-topics-btn" onClick={() => setShowTopics(true)}>
@@ -1360,7 +1394,7 @@
 
     ReactDOM.render(<App />, document.getElementById('root'));
   </script>
-<elevenlabs-convai style="display:none !important" agent-id="agent_6401kjd43rj8f1n9tvprfhg36cd7"></elevenlabs-convai>
+<elevenlabs-convai agent-id="agent_6401kjd43rj8f1n9tvprfhg36cd7"></elevenlabs-convai>
 <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 </body>
 </html>
