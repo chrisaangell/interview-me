@@ -550,10 +550,9 @@
       position: fixed;
       opacity: 0;
       pointer-events: none;
-      width: 0;
-      height: 0;
-      overflow: hidden;
-      z-index: -1;
+      width: 300px;
+      height: 200px;
+      z-index: 99999;
     }
 
     /* Voice CTA Banner */
@@ -971,50 +970,57 @@
       }, [messages]);
 
 
-      const startVoiceSession = () => {
-        // Unlock AudioContext within this user gesture — required for iOS/Safari
-        try {
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          if (AudioCtx) {
-            const ctx = new AudioCtx();
-            ctx.resume();
-          }
-        } catch(e) {}
-
-        // Click the ElevenLabs widget's real Start button
+      const positionWidgetOver = (btnId) => {
+        const btn = document.getElementById(btnId);
         const w = document.querySelector('elevenlabs-convai');
-        if (w) {
-          // Make widget briefly renderable so its shadow DOM button exists
-          w.style.setProperty('display', 'block', 'important');
-          w.style.setProperty('position', 'fixed', 'important');
-          w.style.setProperty('top', '-9999px', 'important');
-          w.style.setProperty('left', '-9999px', 'important');
-          w.style.setProperty('width', '1px', 'important');
-          w.style.setProperty('height', '1px', 'important');
-          w.style.setProperty('opacity', '0', 'important');
-          w.style.setProperty('pointer-events', 'none', 'important');
+        if (!btn || !w) return;
+        const r = btn.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        w.style.setProperty('left', (cx - 160) + 'px', 'important');
+        w.style.setProperty('top', (cy - 138) + 'px', 'important');
+        w.style.setProperty('pointer-events', 'auto', 'important');
+      };
 
-          const tryClick = (attempts) => {
-            if (attempts <= 0) return;
-            const sr = w.shadowRoot;
-            if (sr) {
-              const startBtn = sr.querySelector('button[aria-label="Start a call"]');
-              if (startBtn) { startBtn.click(); return; }
-            }
-            setTimeout(() => tryClick(attempts - 1), 100);
-          };
-          tryClick(10);
-        }
+      useEffect(() => {
+        const w = document.querySelector('elevenlabs-convai');
+        if (!w) return;
+        let prevHadEnd = false;
+        const observer = new MutationObserver(() => {
+          const sr = w.shadowRoot;
+          if (!sr) return;
+          const hasEnd = !!sr.querySelector('button[aria-label="End"]');
+          if (!hasEnd && prevHadEnd) {
+            setVoiceActive(false);
+            w.style.setProperty('pointer-events', 'none', 'important');
+          }
+          prevHadEnd = hasEnd;
+        });
+        const waitForShadow = setInterval(() => {
+          if (w.shadowRoot) { observer.observe(w.shadowRoot, { childList: true, subtree: true }); clearInterval(waitForShadow); }
+        }, 100);
+        const reposition = () => positionWidgetOver('voice-cta-btn');
+        reposition();
+        window.addEventListener('resize', reposition);
+        window.addEventListener('scroll', reposition, { passive: true });
+        return () => {
+          observer.disconnect();
+          clearInterval(waitForShadow);
+          window.removeEventListener('resize', reposition);
+          window.removeEventListener('scroll', reposition);
+        };
+      }, []);
+
+      const startVoiceSession = () => {
+        positionWidgetOver('voice-cta-btn');
         setVoiceActive(true);
       }
+
       const endVoiceSession = () => {
         const w = document.querySelector('elevenlabs-convai');
         if (w && w.shadowRoot) {
-          // Target the End button specifically by aria-label
           const endBtn = w.shadowRoot.querySelector('button[aria-label="End"]');
-          if (endBtn) {
-            endBtn.click();
-          }
+          if (endBtn) endBtn.click();
         }
         setVoiceActive(false);
       };
@@ -1066,7 +1072,7 @@
         },
         {
           id: 'recommendations',
-          icon: 'âââââ',
+          icon: 'Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ',
           title: 'Unsolicited Recommendations',
           desc: 'What others say',
           questions: [
@@ -1162,14 +1168,14 @@
                 </div>
 
                 <p className="disclaimer">
-                  Type your question below, or hit <strong>Talk</strong> to ask with your voice â powered by my cloned voice and AI.
+                  Type your question below, or hit <strong>Talk</strong> to ask with your voice Ã¢ÂÂ powered by my cloned voice and AI.
                 </p>
 
                 <div className="chat-container">
                   {messages.length > 0 && (
                     <div className="chat-actions">
                       <button className="reset-button" onClick={() => { setMessages([]); setShowTopics(true); }}>
-                        <span>â</span> New Conversation
+                        <span>Ã¢ÂÂ</span> New Conversation
                       </button>
                       {!showTopics && (
                         <button className="show-topics-btn" onClick={() => setShowTopics(true)}>
@@ -1283,7 +1289,7 @@
                     <button className="send-btn" onClick={() => handleSubmit()} disabled={loading || !input.trim()}>
                       Send
                     </button>
-                                  <button className={`talk-btn${voiceActive ? ' active' : ''}`} id="voice-talk-btn" onClick={voiceActive ? endVoiceSession : startVoiceSession} title={voiceActive ? 'End conversation' : 'Start a voice conversation'}>
+                                  <button className={`talk-btn${voiceActive ? ' active' : ''}`} id="voice-talk-btn" onClick={voiceActive ? endVoiceSession : () => { positionWidgetOver('voice-talk-btn'); setVoiceActive(true); }} title={voiceActive ? 'End conversation' : 'Start a voice conversation'}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
                                                     Talk
                                   </button>
