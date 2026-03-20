@@ -549,7 +549,7 @@
     elevenlabs-convai {
       position: fixed;
       opacity: 0;
-      pointer-events: none;
+      pointer-events: auto;
       width: 300px;
       height: 200px;
       z-index: 99999;
@@ -930,7 +930,57 @@
         flex-direction: column;
       }
     }
-  </style>
+  
+    /* Voice Modal Overlay */
+    .voice-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 99998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .voice-modal-box {
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid #2563eb;
+      box-shadow: 0 0 40px rgba(37,99,235,0.3);
+      max-width: 340px;
+      width: 90%;
+    }
+    .voice-modal-title {
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .voice-modal-sub {
+      color: #9ca3af;
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .voice-modal-cancel {
+      background: transparent;
+      border: 1px solid #374151;
+      color: #9ca3af;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 4px;
+    }
+    .voice-modal-cancel:hover { border-color: #6b7280; color: white; }
+    </style>
 </head>
 <body>
   <div id="root"></div>
@@ -970,26 +1020,38 @@
       }, [messages]);
 
 
-      const positionWidgetOver = (btnId) => {
-        const btn = document.getElementById(btnId);
+      const [showVoiceModal, setShowVoiceModal] = React.useState(false);
+
+      const positionWidgetInModal = () => {
         const w = document.querySelector('elevenlabs-convai');
-        if (!btn || !w) return;
-        const r = btn.getBoundingClientRect();
+        const box = document.getElementById('voice-modal-widget-anchor');
+        if (!w || !box) return;
+        const r = box.getBoundingClientRect();
         const cx = r.left + r.width / 2;
         const cy = r.top + r.height / 2;
-        w.style.setProperty('left', (cx - 160) + 'px', 'important');
+        w.style.setProperty('left', (cx - 140) + 'px', 'important');
         w.style.setProperty('top', (cy - 138) + 'px', 'important');
         w.style.setProperty('pointer-events', 'auto', 'important');
+        w.style.setProperty('opacity', '0', 'important');
+        w.style.setProperty('z-index', '99999', 'important');
       };
 
       useEffect(() => {
         const w = document.querySelector('elevenlabs-convai');
         if (!w) return;
+        const termsKey = 'el-ca-agreed';
+        if (!localStorage.getItem(termsKey)) localStorage.setItem(termsKey, 'true');
+        w.setAttribute('terms-key', termsKey);
         let prevHadEnd = false;
         const observer = new MutationObserver(() => {
           const sr = w.shadowRoot;
           if (!sr) return;
           const hasEnd = !!sr.querySelector('button[aria-label="End"]');
+          if (hasEnd && !prevHadEnd) {
+            setShowVoiceModal(false);
+            setVoiceActive(true);
+            w.style.setProperty('pointer-events', 'none', 'important');
+          }
           if (!hasEnd && prevHadEnd) {
             setVoiceActive(false);
             w.style.setProperty('pointer-events', 'none', 'important');
@@ -999,21 +1061,28 @@
         const waitForShadow = setInterval(() => {
           if (w.shadowRoot) { observer.observe(w.shadowRoot, { childList: true, subtree: true }); clearInterval(waitForShadow); }
         }, 100);
-        const reposition = () => positionWidgetOver('voice-cta-btn');
-        reposition();
-        window.addEventListener('resize', reposition);
-        window.addEventListener('scroll', reposition, { passive: true });
         return () => {
           observer.disconnect();
           clearInterval(waitForShadow);
-          window.removeEventListener('resize', reposition);
-          window.removeEventListener('scroll', reposition);
         };
       }, []);
 
+      useEffect(() => {
+        if (showVoiceModal) {
+          setTimeout(positionWidgetInModal, 50);
+        }
+      }, [showVoiceModal]);
+
+      const openVoiceModal = () => {
+        setShowVoiceModal(true);
+      };
+
+      const closeVoiceModal = () => {
+        setShowVoiceModal(false);
+      };
+
       const startVoiceSession = () => {
-        positionWidgetOver('voice-cta-btn');
-        setVoiceActive(true);
+        openVoiceModal();
       }
 
       const endVoiceSession = () => {
@@ -1289,7 +1358,7 @@
                     <button className="send-btn" onClick={() => handleSubmit()} disabled={loading || !input.trim()}>
                       Send
                     </button>
-                                  <button className={`talk-btn${voiceActive ? ' active' : ''}`} id="voice-talk-btn" onClick={voiceActive ? endVoiceSession : () => { positionWidgetOver('voice-talk-btn'); setVoiceActive(true); }} title={voiceActive ? 'End conversation' : 'Start a voice conversation'}>
+                                  <button className={`talk-btn${voiceActive ? ' active' : ''}`} id="voice-talk-btn" onClick={voiceActive ? endVoiceSession : openVoiceModal} title={voiceActive ? 'End conversation' : 'Start a voice conversation'}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
                                                     Talk
                                   </button>
@@ -1394,6 +1463,18 @@
               <a href="https://calendly.com/chrisaangell" target="_blank" className="footer-link">Calendly</a>
             </div>
           </footer>
+
+          {showVoiceModal && (
+            <div className="voice-modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) closeVoiceModal(); }}>
+              <div className="voice-modal-box">
+                <div className="voice-modal-title">Start your voice conversation</div>
+                <div className="voice-modal-sub">Tap the button below to connect with Chris's digital twin</div>
+                <div id="voice-modal-widget-anchor" style={{width: '232px', height: '36px', position: 'relative', zIndex: 99999}}>
+                </div>
+                <button className="voice-modal-cancel" onClick={closeVoiceModal}>Cancel</button>
+              </div>
+            </div>
+          )}
         </>
       );
     }
