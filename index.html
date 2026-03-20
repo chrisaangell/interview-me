@@ -981,6 +981,14 @@
 
       const startVoiceSession = async () => {
         if (convRef.current) return;
+        const origGUM = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+        let stream = null;
+        try {
+          stream = await origGUM({ audio: true });
+        } catch(e) {
+          return;
+        }
+        navigator.mediaDevices.getUserMedia = async (c) => stream;
         setVoiceActive(true);
         try {
           const conv = await window.ELConversation.startSession({
@@ -998,6 +1006,8 @@
         } catch(e) {
           convRef.current = null;
           setVoiceActive(false);
+        } finally {
+          navigator.mediaDevices.getUserMedia = origGUM;
         }
       }
 
