@@ -1072,7 +1072,7 @@
         },
         {
           id: 'recommendations',
-          icon: 'Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ',
+          icon: '★★★★☆',
           title: 'Unsolicited Recommendations',
           desc: 'What others say',
           questions: [
@@ -1168,14 +1168,14 @@
                 </div>
 
                 <p className="disclaimer">
-                  Type your question below, or hit <strong>Talk</strong> to ask with your voice Ã¢ÂÂ powered by my cloned voice and AI.
+                  Type your question below, or hit <strong>Talk</strong> to ask with your voice — powered by my cloned voice and AI.
                 </p>
 
                 <div className="chat-container">
                   {messages.length > 0 && (
                     <div className="chat-actions">
                       <button className="reset-button" onClick={() => { setMessages([]); setShowTopics(true); }}>
-                        <span>Ã¢ÂÂ</span> New Conversation
+                        <span>←</span> New Conversation
                       </button>
                       {!showTopics && (
                         <button className="show-topics-btn" onClick={() => setShowTopics(true)}>
