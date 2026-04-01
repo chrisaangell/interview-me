@@ -1105,7 +1105,7 @@
         },
         {
           id: 'recommendations',
-          icon: 'âââââ',
+          icon: '\u2605\u2605\u2605\u2605\u2606',
           title: 'Unsolicited Recommendations',
           desc: 'What others say',
           questions: [
@@ -1201,14 +1201,14 @@
                 </div>
 
                 <p className="disclaimer">
-                  Type your question below, or hit <strong>Talk</strong> to ask with your voice â powered by my cloned voice and AI.
+                  Type your question below, or hit <strong>Talk</strong> to ask with your voice {'\u2014'} powered by my cloned voice and AI.
                 </p>
 
                 <div className="chat-container">
                   {messages.length > 0 && (
                     <div className="chat-actions">
                       <button className="reset-button" onClick={() => { setMessages([]); setShowTopics(true); }}>
-                        <span>â</span> New Conversation
+                        <span>{'\u2190'}</span> New Conversation
                       </button>
                       {!showTopics && (
                         <button className="show-topics-btn" onClick={() => setShowTopics(true)}>
@@ -1401,7 +1401,7 @@
               </div>
               <div className="tech-item">
                 <img className="tech-icon" src="https://cdn.simpleicons.org/linkedin" alt="LinkedIn Ads" />
-                <span className="tooltip">"very difficult to find ROI — lower your expectations"</span>
+                <span className="tooltip">"very difficult to find ROI {'\u2014'} lower your expectations"</span>
                 <span className="tech-name">LinkedIn Ads</span>
               </div>
               <div className="tech-item">
