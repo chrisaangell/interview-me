@@ -11,6 +11,7 @@ exports.handler = async (event, context) => {
       const messages = body.messages || [];
       const isStreaming = body.stream === true;
 
+      // Extract the latest user question for logging
       const userMessages = messages.filter(msg => msg.role === 'user');
           const latestUserQuestion = userMessages.length > 0
             ? (typeof userMessages[userMessages.length - 1].content === 'string'
@@ -20,6 +21,7 @@ exports.handler = async (event, context) => {
 
       const userAgent = event.headers['user-agent'] || event.headers['User-Agent'] || '';
 
+      // Log to Google Sheet (fire-and-forget)
       if (latestUserQuestion) {
               fetch('https://script.google.com/macros/s/AKfycbyip-sWnfUZ2oYcpaVOltCmPktkrSAehmnElZ9VI5nkateO7WyQaXZaKTl7Ve8ntHmA/exec', {
                         method: 'POST',
@@ -28,9 +30,9 @@ exports.handler = async (event, context) => {
               }).catch(() => {});
       }
 
-      const systemPrompt = \`You ARE Chris Angell. Answer in first person - conversational, confident, battle-tested. 2-4 paragraphs max, lead with details then back with numbers.
+      const systemPrompt = `You ARE Chris Angell. Answer in first person - conversational, confident, battle-tested. 2-4 paragraphs max, lead with details then back with numbers.
 
-IDENTITY: Complete GTM builder (not just \"marketing\"). You build revenue engines: sales methodology, BDR/SDR teams, demand gen, product marketing, customer marketing, ops, ICP identification. Also done interim product management. Co-founded Adeptia (exited to PSG, $70M, 2022). Co-founding GrowthMax AI nights/weekends.
+IDENTITY: Complete GTM builder (not just "marketing"). You build revenue engines: sales methodology, BDR/SDR teams, demand gen, product marketing, customer marketing, ops, ICP identification. Also done interim product management. Co-founded Adeptia (exited to PSG, $70M, 2022). Co-founding GrowthMax AI nights/weekends.
 
 EXPERIENCE:
 - Traject Data (2023-24) CMO: $100M+ ARR, 10% growth target hit, 100%+ ACV increase via SMB-to-enterprise repositioning, built AI-era SEO/SGE strategy
@@ -47,15 +49,15 @@ Philosophy: Execution > Strategy. Strengths-based management. Revenue-first.
 PERSONAL: Winchester MA. Father of two student athletes (St. John's Prep, UPenn D1). Built athletic culture at home - counseling, nutrition, custom gym. Avid skier. Commercial real estate investor. Olympics volunteer (2021-24). HBDI: Analytical, Problem Solver, Intuitive, Synthesizer, Innovator. Energized by building new things.
 
 RECOMMENDATIONS (use 2-3 when asked what others say):
-- Adam Smith (Traject, direct report): \"consistently raised the bar...combines strategic thinking with deep customer insight and the ability to build the execution engine\"
-- Edward Marcheselli (BAI, manager): \"marketing leadership enabled the company to double revenue in under two years...innovative mindframe, proactive style\"
-- David Ko (Nokia, teammate): \"intuitive mind, always asking the right questions...people can rally around him\"
-- Bruce Baumhardt (3Com, teammate): \"breaks through clutter with clear observations...I include Chris on every strategic decision\"
-- Michael Liddell (investor): \"ability to present difficult concepts and persuade an audience...natural marketer\"
-- Barry Hardek (3Com, manager): \"enthusiasm, adaptability, and marketing savvy\"
-- Baris Karadogan (teammate): \"solid sales guy, clear thinker, goes above and beyond\"
+- Adam Smith (Traject, direct report): "consistently raised the bar...combines strategic thinking with deep customer insight and the ability to build the execution engine"
+- Edward Marcheselli (BAI, manager): "marketing leadership enabled the company to double revenue in under two years...innovative mindframe, proactive style"
+- David Ko (Nokia, teammate): "intuitive mind, always asking the right questions...people can rally around him"
+- Bruce Baumhardt (3Com, teammate): "breaks through clutter with clear observations...I include Chris on every strategic decision"
+- Michael Liddell (investor): "ability to present difficult concepts and persuade an audience...natural marketer"
+- Barry Hardek (3Com, manager): "enthusiasm, adaptability, and marketing savvy"
+- Baris Karadogan (teammate): "solid sales guy, clear thinker, goes above and beyond"
 
-RULES: Never say SEO isn't a strength. Don't over-emphasize PE. Don't force M&A into every answer. Say \"GTM engines\" not just \"marketing.\" Keep it conversational and concise.\`;
+RULES: Never say SEO isn't a strength. Don't over-emphasize PE. Don't force M&A into every answer. Say "GTM engines" not just "marketing." Keep it conversational and concise.`;
 
       const filteredMessages = messages.filter(msg => msg.role !== 'system');
       const mappedMessages = filteredMessages.map(msg => ({
@@ -63,6 +65,7 @@ RULES: Never say SEO isn't a strength. Don't over-emphasize PE. Don't force M&A 
                 content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)
       }));
 
+      // Models to try in order: primary, then fallback
       const models = ['claude-sonnet-4-6', 'claude-haiku-4-5-20251001'];
       const MAX_RETRIES = 2;
       let anthropicResponse;
@@ -88,7 +91,7 @@ RULES: Never say SEO isn't a strength. Don't over-emphasize PE. Don't force M&A 
 
                         if (anthropicResponse.status === 429 || anthropicResponse.status === 529) {
                                     const waitMs = 1000 * (attempt + 1);
-                                    console.warn(model + ' returned ' + anthropicResponse.status + ', retry ' + (attempt + 1) + '/' + MAX_RETRIES);
+                                    console.warn(`${model} returned ${anthropicResponse.status}, retry ${attempt + 1}/${MAX_RETRIES}`);
                                     await new Promise(r => setTimeout(r, waitMs));
                                     continue;
                         }
@@ -97,13 +100,14 @@ RULES: Never say SEO isn't a strength. Don't over-emphasize PE. Don't force M&A 
               }
               if (succeeded && anthropicResponse.ok) break;
               if (model !== models[models.length - 1]) {
-                        console.warn(model + ' exhausted retries, falling back to next model');
+                        console.warn(`${model} exhausted retries, falling back to next model`);
               }
       }
 
+      // Check for API errors before parsing
       if (!anthropicResponse.ok) {
               const errorBody = await anthropicResponse.text();
-              console.error('Anthropic API error: ' + anthropicResponse.status + ' - ' + errorBody);
+              console.error(`Anthropic API error: ${anthropicResponse.status} - ${errorBody}`);
               return {
                         statusCode: 502,
                         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
@@ -121,7 +125,7 @@ RULES: Never say SEO isn't a strength. Don't over-emphasize PE. Don't force M&A 
                       const { done, value } = await reader.read();
                       if (done) break;
                 const chunk = decoder.decode(value, { stream: true });
-                      const lines = chunk.split('\\n');
+                      const lines = chunk.split('\n');
                 for (const line of lines) {
                             if (line.startsWith('data: ')) {
                                           const data = line.slice(6).trim();
@@ -138,13 +142,13 @@ RULES: Never say SEO isn't a strength. Don't over-emphasize PE. Don't force M&A 
                                                                     model: 'claude',
                                                                     choices: [{ index: 0, delta: { content: text }, finish_reason: null }]
                                                 };
-                                                              chunks.push('data: ' + JSON.stringify(openAIChunk) + '\\n\\n');
+                                                              chunks.push('data: ' + JSON.stringify(openAIChunk) + '\n\n');
                                             }
                               } catch (e) {}
                             }
                 }
             }
-            chunks.push('data: [DONE]\\n\\n');
+            chunks.push('data: [DONE]\n\n');
             return {
                       statusCode: 200,
                       headers: {
