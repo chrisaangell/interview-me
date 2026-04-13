@@ -487,6 +487,64 @@
       cursor: not-allowed;
     }
 
+    /* Interaction Sections */
+    .interaction-section {
+      margin-bottom: 16px;
+    }
+
+    .interaction-section:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .section-label .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      font-size: 10px;
+      font-weight: 700;
+      color: #6b7280;
+      flex-shrink: 0;
+    }
+
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e5e7eb;
+    }
+
+    .section-divider span {
+      font-size: 11px;
+      font-weight: 500;
+      color: #9ca3af;
+      text-transform: lowercase;
+    }
+
     /* Loading */
     .loading {
       display: flex;
@@ -1004,7 +1062,7 @@
         // Only auto-scroll if user is near bottom
         if (messages.length > 0 && isNearBottom()) {
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }
+           }
       }, [messages]);
 
 
@@ -1201,7 +1259,7 @@
                 </div>
 
                 <p className="disclaimer">
-                  Type your question below, or hit <strong>Talk</strong> to ask with your voice {'\u2014'} powered by my cloned voice and AI.
+                  Three ways to interview me: start a voice conversation, explore a topic, or type your own question {'\u2014'} powered by AI.
                 </p>
 
                 <div className="chat-container">
@@ -1220,62 +1278,71 @@
 
                   {showTopics && (
                     <>
-                      {!voiceActive ? (
-                        <button
-                          className="voice-cta"
-                          id="voice-cta-btn"
-                          onClick={startVoiceSession}
-                        >
-                          <img src="chris-angell-portrait.png" className="voice-avatar" alt="Chris Angell" />
-                          <div className="voice-cta-text">
-                            <div className="voice-cta-title">Speak with my digital business twin now</div>
-                          </div>
-                          <span style={{fontSize: '20px', opacity: 0.7}}>&#x203A;</span>
-                        </button>
-                      ) : (
-                        <div className="voice-active-bar">
-                          <div className="voice-active-indicator">
-                            <span className="voice-dot"></span>
-                            <span className="voice-dot"></span>
-                            <span className="voice-dot"></span>
-                          </div>
-                          <div className="voice-active-text">
-                            <div className="voice-active-title">Voice conversation active</div>
-                            <div className="voice-active-sub">Auto-ends after 10s of silence</div>
-                          </div>
-                          <button className="end-voice-btn" onClick={endVoiceSession}>
-                            End
-                          </button>
+                      <div className="interaction-section">
+                        <div className="section-label">
+                          <span className="section-number">1</span> Have a Conversation
                         </div>
-                      )}
-                      {messages.length === 0 && (
-                        <p className="topics-intro">
-                          Or choose a topic below to type your question.
-                        </p>
-                      )}
-                      <div className="topics-grid">
-                        {topics.map(topic => (
-                          <div
-                            key={topic.id}
-                            className={`topic-card ${selectedTopic === topic.id ? 'expanded' : ''}`}
-                            onClick={() => handleTopicClick(topic.id)}
+                        {!voiceActive ? (
+                          <button
+                            className="voice-cta"
+                            id="voice-cta-btn"
+                            onClick={startVoiceSession}
                           >
-                            <div className={`topic-icon ${topic.id === 'recommendations' ? 'stars' : ''}`}>{topic.icon}</div>
-                            <div className="topic-title">{topic.title}</div>
-                            <div className="topic-desc">{topic.desc}</div>
-                            <div className={`questions-list ${selectedTopic === topic.id ? 'active' : ''}`}>
-                              {topic.questions.map((q, idx) => (
-                                <div key={idx} className="question-item" onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleQuestionClick(q);
-                                }}>
-                                  {q}
-                                </div>
-                              ))}
+                            <img src="chris-angell-portrait.png" className="voice-avatar" alt="Chris Angell" />
+                            <div className="voice-cta-text">
+                              <div className="voice-cta-title">Speak with my digital business twin now</div>
                             </div>
+                            <span style={{fontSize: '20px', opacity: 0.7}}>&#x203A;</span>
+                          </button>
+                        ) : (
+                          <div className="voice-active-bar">
+                            <div className="voice-active-indicator">
+                              <span className="voice-dot"></span>
+                              <span className="voice-dot"></span>
+                              <span className="voice-dot"></span>
+                            </div>
+                            <div className="voice-active-text">
+                              <div className="voice-active-title">Voice conversation active</div>
+                              <div className="voice-active-sub">Auto-ends after 10s of silence</div>
+                            </div>
+                            <button className="end-voice-btn" onClick={endVoiceSession}>
+                              End
+                            </button>
                           </div>
-                        ))}
+                        )}
                       </div>
+
+                      <div className="section-divider"><span>or</span></div>
+
+                      <div className="interaction-section">
+                        <div className="section-label">
+                          <span className="section-number">2</span> Explore a Topic
+                        </div>
+                        <div className="topics-grid">
+                          {topics.map(topic => (
+                            <div
+                              key={topic.id}
+                              className={`topic-card ${selectedTopic === topic.id ? 'expanded' : ''}`}
+                              onClick={() => handleTopicClick(topic.id)}
+                            >
+                              <div className={`topic-icon ${topic.id === 'recommendations' ? 'stars' : ''}`}>{topic.icon}</div>
+                              <div className="topic-title">{topic.title}</div>
+                              <div className="topic-desc">{topic.desc}</div>
+                              <div className={`questions-list ${selectedTopic === topic.id ? 'active' : ''}`}>
+                                {topic.questions.map((q, idx) => (
+                                  <div key={idx} className="question-item" onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleQuestionClick(q);
+                                  }}>
+                                    {q}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
                       {messages.length > 0 && (
                         <button className="hide-topics-btn" onClick={() => setShowTopics(false)}>
                           Hide suggestions
@@ -1308,6 +1375,14 @@
                     <div ref={messagesEndRef} />
                   </div>
 
+                  {showTopics && messages.length === 0 && (
+                    <>
+                      <div className="section-divider"><span>or</span></div>
+                      <div className="section-label" style={{marginBottom: '10px'}}>
+                        <span className="section-number">3</span> Ask Your Own Question
+                      </div>
+                    </>
+                  )}
                   <div className="input-container">
                     <div className="input-wrapper">
                       <input
@@ -1315,7 +1390,7 @@
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
-                        placeholder="Interview Me..."
+                        placeholder="Type your question here..."
                         disabled={loading}
                       />
                     </div>
