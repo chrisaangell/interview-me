@@ -501,7 +501,8 @@
       font-weight: 700;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: #9ca3af;
+      color: #2563eb;
+      font-weight: 800;
       margin-bottom: 10px;
       display: flex;
       align-items: center;
@@ -515,11 +516,11 @@
       width: 18px;
       height: 18px;
       border-radius: 50%;
-      background: #f3f4f6;
-      border: 1px solid #e5e7eb;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
       font-size: 10px;
-      font-weight: 700;
-      color: #6b7280;
+      font-weight: 800;
+      color: #2563eb;
       flex-shrink: 0;
     }
 
@@ -570,6 +571,7 @@
 
     /* Talk Button */
     .talk-btn {
+      display: none !important;
       padding: 12px 20px;
       background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
       color: white;
@@ -1062,7 +1064,7 @@
         // Only auto-scroll if user is near bottom
         if (messages.length > 0 && isNearBottom()) {
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-           }
+        }
       }, [messages]);
 
 
@@ -1395,7 +1397,7 @@
                       />
                     </div>
                     <button className="send-btn" onClick={() => handleSubmit()} disabled={loading || !input.trim()}>
-                      Send
+                      Submit question
                     </button>
                                   <button className={`talk-btn${voiceActive ? ' active' : ''}`} id="voice-talk-btn" onClick={voiceActive ? endVoiceSession : startVoiceSession} title={voiceActive ? 'End conversation' : 'Start a voice conversation'}>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
