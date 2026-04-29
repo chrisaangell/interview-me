@@ -1174,8 +1174,6 @@
           title: 'Background',
           desc: 'Where I\'ve been',
           questions: [
-            'Tell me about your AI work.',
-            'Tell me about your product management and strategy experience',
             'Tell me about your M&A integration experience',
             'How do you transform companies from SMB to enterprise?',
             'What industries have you worked in?'
@@ -1190,6 +1188,24 @@
             'What do you do outside of work?',
             'Tell me about GrowthMax AI',
             'What drives you?'
+          ]
+        },
+        {
+          id: 'ai-work',
+          icon: '05',
+          title: 'AI Work',
+          desc: 'GrowthMax, Avair, Auto SKUS, autonomous SEO',
+          questions: [
+            'Tell me about your AI work.'
+          ]
+        },
+        {
+          id: 'pm-strategy',
+          icon: '06',
+          title: 'PM & Strategy',
+          desc: 'Building products and strategy across early-stage startups',
+          questions: [
+            'Tell me about your product management and strategy experience'
           ]
         },
         {
@@ -1302,6 +1318,11 @@
       };
 
       const handleTopicClick = (topicId) => {
+        const topic = topics.find(t => t.id === topicId);
+        if (topic && topic.questions && topic.questions.length === 1) {
+          handleQuestionClick(topic.questions[0]);
+          return;
+        }
         setSelectedTopic(selectedTopic === topicId ? null : topicId);
       };
 
