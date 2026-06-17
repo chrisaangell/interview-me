@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     * {
@@ -1041,9 +1041,16 @@
   
     /* Voice Modal Overlay */
     </style>
-  <script type="module">
-    import { Conversation } from 'https://esm.sh/@11labs/client';
-    window.ELConversation = Conversation;
+  <script>
+    (async function() {
+      try {
+        const m = await import('https://esm.sh/@11labs/client');
+        window.ELConversation = m.Conversation;
+      } catch(e) {
+        console.warn('ElevenLabs SDK failed to load:', e);
+        window.ELConversation = null;
+      }
+    })();
   </script>
 </head>
 <body>
